@@ -5,10 +5,11 @@ import requests
 import re
 from bs4 import BeautifulSoup as bs
 
-display_other_forms = False
-
 if len(sys.argv) < 2:
     print('Usage: jisho [search terms]')
+    exit(1)
+
+display_other_forms = False
 
 search_terms = ' '.join(sys.argv[1:])
 
