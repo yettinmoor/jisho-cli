@@ -32,7 +32,7 @@ for match in matches.find_all('div', class_ = 'concept_light clearfix'):
 
     meanings = match.find('div', class_ = 'concept_light-meanings')
     meanings_count = 1
-    meanings_array = [word_kanji + (f'({word_furigana})' if word_furigana else '')]
+    meanings_array = [word_kanji + (f' ({word_furigana})' if word_furigana else '')]
 
     for meaning in meanings.find_all('div', class_ = 'meaning-definition'):
 
