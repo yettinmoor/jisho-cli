@@ -1,6 +1,6 @@
 # A simple Jisho web scraper
 
-A CLI interface to the popular Jisho Japanese web dictionary. Written in Python with BeautifulSoup API.
+A CLI interface to the popular [Jisho Japanese web dictionary](https://jisho.org). Written in Python with BeautifulSoup API.
 
 ## Todo
 
