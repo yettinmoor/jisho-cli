@@ -1,23 +1,22 @@
 #!/usr/bin/env python
 
 import sys
+import argparse
 import requests
 import re
 from bs4 import BeautifulSoup
 
-if len(sys.argv) < 2:
-    print('Usage: jisho [search terms]')
-    exit(1)
+# Parse CLI arguments
+parser = argparse.ArgumentParser(description='Jisho CLI interface')
+parser.add_argument('-n', '--num-of-results', type=int,\
+        default=0, dest='max_results', help='Max amount of results')
+parser.add_argument('-a', action='store_true',\
+        help='Display alternative ways to write a word.')
+parser.add_argument('search_terms', help='Search terms for Jisho.')
+args = parser.parse_args()
 
-# TODO
-display_other_forms = False
-
-search_terms = ' '.join(sys.argv[1:])
-
-source = requests.get('https://jisho.org/search/' + search_terms).text
-soup = BeautifulSoup(source, 'lxml')
-
-matches = soup.find('div', id = 'primary')
+source = requests.get('https://jisho.org/search/' + args.search_terms).text
+matches = BeautifulSoup(source, 'lxml').find('div', id = 'primary')
 
 if matches is None:
     print('No matches found.')
@@ -27,6 +26,9 @@ result = []
 
 # Loop through all results
 for match in matches.find_all('div', class_ = 'concept_light clearfix'):
+
+    if args.max_results != 0 and len(result) >= args.max_results:
+        break
 
     # Get word + furigana
     # TODO: fix words with spaced out furigana
@@ -55,7 +57,7 @@ for match in matches.find_all('div', class_ = 'concept_light clearfix'):
         if meaning_span.find('span', class_ = 'break-unit') is None:
             meanings_array.append(f'{meanings_count}: {meaning_span.text}')
             meanings_count += 1
-        elif display_other_forms:
+        elif args.a:
             meanings_array.append(f'Other forms: {meaning_span.text}')
 
     # Append to result array
