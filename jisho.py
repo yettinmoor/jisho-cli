@@ -18,10 +18,6 @@ args = parser.parse_args()
 source = requests.get('https://jisho.org/search/' + args.search_terms).text
 matches = BeautifulSoup(source, 'lxml').find('div', id = 'primary')
 
-if matches is None:
-    print('No matches found.')
-    exit(1)
-
 result = []
 
 # Loop through all results
@@ -64,4 +60,4 @@ for match in matches.find_all('div', class_ = 'concept_light clearfix'):
     if len(meanings_array) > 1:
         result.append('\n'.join(meanings_array))
 
-print('\n\n'.join(result))
+print('\n\n'.join(result) if result else 'No matches found.')
