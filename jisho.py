@@ -34,7 +34,7 @@ class JishoEntry:
         if self.tags:
             entry_str += f' <{", ".join(self.tags)}>'
 
-        entry_str += '\n' + '\n'.join([f'{i+1}: {d}' for i, d in enumerate(self.meanings)])
+        entry_str += '\n' + '\n'.join([f'{i+1}. {d}' for i, d in enumerate(self.meanings)])
 
         if display_other and self.other_forms:
             entry_str += '\nOther forms: ' + self.other_forms
