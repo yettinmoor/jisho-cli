@@ -83,11 +83,25 @@ def jisho_search(search_terms, max_results):
             if not meaning_span:
                 continue
 
+            meaning_text = meaning_span.text
+
+            # Find supplementary info e.g. written in kana, polite language, etc.
+            supplement_span = meaning.find('span', class_ = 'supplemental_info')
+            if supplement_span:
+                sup_text = supplement_span.text
+                sup_list = 'kana/Polite/Humble/Honorific/Colloq/Slang/Vulgar/Derogatory'
+                supplements = []
+                for sup in sup_list.split('/'):
+                    if sup in sup_text:
+                        supplements.append(sup.title())
+                if supplements:
+                    meaning_text += f' <{", ".join(supplements)}>'
+
             # Separate meaning entries from "Other forms" entry
             if meaning_span.find('span', class_ = 'break-unit') is None:
-                new_entry.add_meaning(meaning_span.text)
+                new_entry.add_meaning(meaning_text)
             else:
-                new_entry.add_other(meaning_span.text)
+                new_entry.add_other(meaning_text)
 
         # Add to result list
         if not new_entry.is_empty():
