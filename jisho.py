@@ -42,8 +42,11 @@ class JishoEntry:
         return entry_str
 
 
-def jisho_search(search_terms, max_results):
-    source = requests.get('https://jisho.org/search/' + search_terms).text
+def jisho_search(search_terms, max_results, force_romaji):
+    if force_romaji:
+        search_terms = f'"{search_terms}"'
+
+    source = requests.get(f'https://jisho.org/search/{search_terms}').text
     matches = BeautifulSoup(source, 'lxml').find('div', id = 'primary')
 
     result = []
@@ -125,8 +128,10 @@ if __name__ == '__main__':
             default=0, dest='max_results', help='Max amount of results')
     parser.add_argument('-a', action='store_true',\
             dest='display_other', help='Display alternative ways to write a word.')
+    parser.add_argument('-r', action='store_true',\
+            dest='force_romaji', help='Always interpret search terms as English (Romaji) letters.')
     parser.add_argument('search_terms', help='Search terms for Jisho.')
     args = parser.parse_args()
 
-    result = jisho_search(args.search_terms, args.max_results)
+    result = jisho_search(args.search_terms, args.max_results, args.force_romaji)
     print_search(result, args.display_other)
