@@ -65,7 +65,7 @@ def jisho_search(search_terms, max_results):
         # Get "Common word" and JLPT tags
         for tag in match.find_all('span', class_ = 'concept_light-tag'):
             if tag.text == 'Common word':
-                new_entry.add_tag('C')
+                new_entry.add_tag('Common')
             elif tag.text.startswith('JLPT'):
                 new_entry.add_tag(tag.text.split(' ')[-1])
 

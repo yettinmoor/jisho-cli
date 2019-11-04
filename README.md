@@ -8,7 +8,7 @@ Type `jisho [search terms]`. Multiple-word searches should be enclosed in "quota
 
 ```
 $ jisho -n 1 nihongo
-日本語 (にほんご) <C>
+日本語 (にほんご) <Common>
 1: Japanese (language)
 ```
 
@@ -18,7 +18,7 @@ Tags are shown next to the word. C connotes a common word; N[1-5] refers to JLPT
 
 ```
 $ jisho -n 1 -a 恋
-恋 (こい) <C, N3>
+恋 (こい) <Common, N3>
 1. (romantic) love
 Other forms: 戀 【こい】、孤悲 【こい】
 ```
