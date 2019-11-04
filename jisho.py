@@ -2,10 +2,47 @@
 
 import argparse
 import requests
-import re
 from bs4 import BeautifulSoup
 
-def jisho_search(search_terms, max_results, display_other_forms):
+
+class JishoEntry:
+
+    def __init__(self, word, furigana):
+        self.word = word
+        self.furigana = furigana
+
+        self.tags = []
+        self.meanings = []
+        self.other_forms = ''
+
+    def add_tags(self, tag):
+        self.tags.append(tag)
+
+    def add_meaning(self, meaning):
+        self.meanings.append(meaning)
+
+    def add_other(self, other_forms):
+        self.other_forms = other_forms
+
+    def is_empty(self):
+        return not self.meanings
+
+    def as_str(self, display_other):
+        entry_str = self.word
+        if self.furigana:
+            entry_str += f' ({self.furigana})'
+        if self.tags:
+            entry_str += f' <{", ".join(self.tags)}>'
+
+        entry_str += '\n' + '\n'.join([f'{i+1}: {d}' for i, d in enumerate(self.meanings)])
+
+        if display_other and self.other_forms:
+            entry_str += '\nOther forms: ' + self.other_forms
+
+        return entry_str
+
+
+def jisho_search(search_terms, max_results):
     source = requests.get('https://jisho.org/search/' + search_terms).text
     matches = BeautifulSoup(source, 'lxml').find('div', id = 'primary')
 
@@ -18,19 +55,18 @@ def jisho_search(search_terms, max_results, display_other_forms):
             break
 
         # Get word + furigana
-        # TODO: fix words with spaced out furigana
         word = match.find('div', class_ = 'concept_light-representation')
         word_furigana = word.find('span', class_ = 'furigana').text.strip()
         word_text = word.find('span', class_ = 'text').text.strip()
 
-        # Get all meaning divs, prepary storage array
-        meanings = match.find('div', class_ = 'concept_light-meanings')
-        meanings_count = 1
-        meanings_array = [word_text + (f' ({word_furigana})' if word_furigana else '')]
+        # Create entry object
+        new_entry = JishoEntry(word_text, word_furigana)
 
+        # Loop through meanings in entry
+        meanings = match.find('div', class_ = 'concept_light-meanings')
         for meaning in meanings.find_all('div', class_ = 'meaning-definition'):
 
-            # TODO: add wiki entries?
+            # Ignore wiki entries
             if meaning.find('span', class_ = 'meaning-abstract') is not None:
                 continue
 
@@ -42,17 +78,23 @@ def jisho_search(search_terms, max_results, display_other_forms):
 
             # Separate meaning entries from "Other forms" entry
             if meaning_span.find('span', class_ = 'break-unit') is None:
-                meanings_array.append(f'{meanings_count}: {meaning_span.text}')
-                meanings_count += 1
-            elif display_other_forms:
-                meanings_array.append(f'Other forms: {meaning_span.text}')
+                new_entry.add_meaning(meaning_span.text)
+            else:
+                new_entry.add_other(meaning_span.text)
 
-        # Append to result array
-        if len(meanings_array) > 1:
-            result.append('\n'.join(meanings_array))
+        # Add to result list
+        if not new_entry.is_empty():
+            result.append(new_entry)
 
     return result
-    # print('\n\n'.join(result) if result else 'No matches found.')
+
+
+def print_search(search_result, display_other):
+    if not search_result:
+        print('No matches found.')
+    else:
+        print('\n\n'.join(map(lambda r: r.as_str(display_other), search_result)))
+
 
 if __name__ == '__main__':
 
@@ -65,5 +107,5 @@ if __name__ == '__main__':
     parser.add_argument('search_terms', help='Search terms for Jisho.')
     args = parser.parse_args()
 
-    result = jisho_search(args.search_terms, args.max_results, args.display_other)
-    print('\n\n'.join(result) if result else 'No matches found.')
+    result = jisho_search(args.search_terms, args.max_results)
+    print_search(result, args.display_other)
