@@ -12,7 +12,7 @@ $ jisho -n 1 nihongo
 1: Japanese (language)
 ```
 
-Tags are shown next to the word. C connotes a common word; N[1-5] refers to JLPT level.
+Tags are shown next to the word. `Common` connotes a commonly used word; `N1` to `N5` refers to JLPT level.
 
 `jisho -a` will display alternate forms if any are found.
 
