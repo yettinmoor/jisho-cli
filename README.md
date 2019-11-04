@@ -11,10 +11,10 @@ A CLI interface to the popular [Jisho Japanese web dictionary](https://jisho.org
 
 ```
 $ jisho nihongo
-日本語(にほんご)
+日本語 (にほんご)
 1: Japanese (language)
 
-日本語能力試験(にほんごのうりょくしけん)
+日本語能力試験 (にほんごのうりょくしけん)
 1: Japanese Language Proficiency Test; JLPT
 
 [etc.]
@@ -22,7 +22,7 @@ $ jisho nihongo
 
 ```
 $ jisho 走る
-走る(はし)
+走る (はし)
 1: to run
 2: to travel (movement of vehicles); to drive; to flow (e.g. energy)
 3: to hurry to
