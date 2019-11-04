@@ -15,7 +15,7 @@ class JishoEntry:
         self.meanings = []
         self.other_forms = ''
 
-    def add_tags(self, tag):
+    def add_tag(self, tag):
         self.tags.append(tag)
 
     def add_meaning(self, meaning):
@@ -61,6 +61,13 @@ def jisho_search(search_terms, max_results):
 
         # Create entry object
         new_entry = JishoEntry(word_text, word_furigana)
+
+        # Get "Common word" and JLPT tags
+        for tag in match.find_all('span', class_ = 'concept_light-tag'):
+            if tag.text == 'Common word':
+                new_entry.add_tag('C')
+            elif tag.text.startswith('JLPT'):
+                new_entry.add_tag(tag.text.split(' ')[-1])
 
         # Loop through meanings in entry
         meanings = match.find('div', class_ = 'concept_light-meanings')
