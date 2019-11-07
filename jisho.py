@@ -92,7 +92,7 @@ def jisho_search(search_terms, max_results, force_romaji):
             supplement_span = meaning.find('span', class_ = 'supplemental_info')
             if supplement_span:
                 sup_text = supplement_span.text
-                sup_list = 'kana/Polite/Humble/Honorific/Colloq/Slang/Vulgar/Derogatory'
+                sup_list = 'kana/neg/Polite/Humble/Honorific/Colloq/Slang/Vulgar/Derogatory'
                 supplements = []
                 for sup in sup_list.split('/'):
                     if sup in sup_text:
