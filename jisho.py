@@ -120,8 +120,7 @@ def print_search(search_result, display_other):
         print('\n\n'.join(map(lambda r: r.as_str(display_other), search_result)))
 
 
-if __name__ == '__main__':
-
+def parser(args):
     # Parse CLI arguments
     parser = argparse.ArgumentParser(description='Jisho CLI interface')
     parser.add_argument('-n', '--num-of-results', type=int,\
@@ -131,7 +130,13 @@ if __name__ == '__main__':
     parser.add_argument('-r', action='store_true',\
             dest='force_romaji', help='Always interpret search terms as English (Romaji) letters.')
     parser.add_argument('search_terms', help='Search terms for Jisho.')
-    args = parser.parse_args()
+    return parser.parse_args(args) if args else parser.parse_args()
 
+
+def main(args_=None):
+    args = parser(args_)
     result = jisho_search(args.search_terms, args.max_results, args.force_romaji)
     print_search(result, args.display_other)
+
+if __name__ == '__main__':
+    main()
