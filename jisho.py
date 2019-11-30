@@ -49,12 +49,12 @@ def jisho_search(search_terms, max_results, force_romaji):
     source = requests.get(f'https://jisho.org/search/{search_terms}').text
     matches = BeautifulSoup(source, 'lxml').find('div', id = 'primary')
 
-    result = []
+    found_entries = []
 
     # Loop through all results
     for match in matches.find_all('div', class_ = 'concept_light clearfix'):
 
-        if max_results != 0 and len(result) >= max_results:
+        if max_results != 0 and len(found_entries) >= max_results:
             break
 
         # Get word + furigana
@@ -108,16 +108,16 @@ def jisho_search(search_terms, max_results, force_romaji):
 
         # Add to result list
         if not new_entry.is_empty():
-            result.append(new_entry)
+            found_entries.append(new_entry)
 
-    return result
+    return found_entries
 
 
-def print_search(search_result, display_other):
+def result_as_str(search_result, display_other):
     if not search_result:
-        print('No matches found.')
+        return 'No matches found.'
     else:
-        print('\n\n'.join(map(lambda r: r.as_str(display_other), search_result)))
+        return '\n\n'.join(map(lambda r: r.as_str(display_other), search_result))
 
 
 def parser(args):
@@ -136,7 +136,8 @@ def parser(args):
 def main(args_=None):
     args = parser(args_)
     result = jisho_search(args.search_terms, args.max_results, args.force_romaji)
-    print_search(result, args.display_other)
+    print(result_as_str(result, args.display_other))
+
 
 if __name__ == '__main__':
     main()
