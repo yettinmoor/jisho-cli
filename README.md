@@ -27,6 +27,15 @@ Tags are also displayed next to invidivual meanings. For example, `Kana` means t
 
 If Romaji input can be transcribed into kana, Jisho will transcribe it. For example, `jisho made` will search for まで. Use `jisho -r` to force Romaji.
 
+## Tips
+
+Use this shell script to page the output of `jisho` into a pager.
+
+```shell
+#!/usr/bin/env sh
+jisho "$@" | less
+```
+
 ## Todo
 
 * Kanji page (e.g. `jisho -k 恋`)
