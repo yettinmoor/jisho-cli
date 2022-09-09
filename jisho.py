@@ -15,31 +15,16 @@ class JishoEntry:
         self.meanings = []
         self.other_forms = ''
 
-    def add_tag(self, tag):
-        self.tags.append(tag)
-
-    def add_meaning(self, meaning):
-        self.meanings.append(meaning)
-
-    def add_other(self, other_forms):
-        self.other_forms = other_forms
-
-    def is_empty(self):
-        return not self.meanings
-
-    def as_str(self, display_other):
-        entry_str = self.word
+    def __str__(self):
+        s = self.word
         if self.furigana:
-            entry_str += f' ({self.furigana})'
+            s += f' ({self.furigana})'
         if self.tags:
-            entry_str += f' <{", ".join(self.tags)}>'
-
-        entry_str += '\n' + '\n'.join([f'{i+1}. {d}' for i, d in enumerate(self.meanings)])
-
-        if display_other and self.other_forms:
-            entry_str += '\nOther forms: ' + self.other_forms
-
-        return entry_str
+            s += f' <{", ".join(self.tags)}>'
+        s += '\n' + '\n'.join([f'{i}. {d}' for i, d in enumerate(self.meanings, 1)])
+        if self.other_forms:
+            s += '\nOther forms: ' + self.other_forms
+        return s
 
 
 def jisho_search(search_terms, max_results, force_romaji):
@@ -68,9 +53,9 @@ def jisho_search(search_terms, max_results, force_romaji):
         # Get "Common word" and JLPT tags
         for tag in match.find_all('span', class_ = 'concept_light-tag'):
             if tag.text == 'Common word':
-                new_entry.add_tag('Common')
+                new_entry.tags.append('Common')
             elif tag.text.startswith('JLPT'):
-                new_entry.add_tag(tag.text.split(' ')[-1])
+                new_entry.tags.append(tag.text.split(' ')[-1])
 
         # Loop through meanings in entry
         meanings = match.find('div', class_ = 'concept_light-meanings')
@@ -91,33 +76,26 @@ def jisho_search(search_terms, max_results, force_romaji):
             # Find supplementary info e.g. written in kana, polite language, etc.
             supplement_span = meaning.find('span', class_ = 'supplemental_info')
             if supplement_span:
-                sup_text = supplement_span.text
-                sup_list = 'kana/neg/Polite/Humble/Honorific/Colloq/Slang/Vulgar/Derogatory'
-                supplements = []
-                for sup in sup_list.split('/'):
-                    if sup in sup_text:
-                        supplements.append(sup.title())
+                sup_list = 'Kana/Neg/Polite/Humble/Honorific/Colloq/Slang/Vulgar/Derogatory'
+                supplements = [sup for sup in sup_list.split('/') if sup.lower() in supplement_span.text]
                 if supplements:
                     meaning_text += f' <{", ".join(supplements)}>'
 
             # Separate meaning entries from "Other forms" entry
             if meaning_span.find('span', class_ = 'break-unit') is None:
-                new_entry.add_meaning(meaning_text)
+                new_entry.meanings.append(meaning_text)
             else:
-                new_entry.add_other(meaning_text)
+                new_entry.other_forms = meaning_text
 
         # Add to result list
-        if not new_entry.is_empty():
+        if new_entry.meanings:
             found_entries.append(new_entry)
 
     return found_entries
 
 
-def result_as_str(search_result, display_other):
-    if not search_result:
-        return 'No matches found.'
-    else:
-        return '\n\n'.join(map(lambda r: r.as_str(display_other), search_result))
+def result_as_str(results):
+    return '\n\n'.join(map(str, results)) or 'No matches found.'
 
 
 def parser(args):
@@ -125,8 +103,6 @@ def parser(args):
     parser = argparse.ArgumentParser(description='Jisho CLI interface')
     parser.add_argument('-n', '--num-of-results', type=int,\
             default=0, dest='max_results', help='Max amount of results')
-    parser.add_argument('-a', action='store_true',\
-            dest='display_other', help='Display alternative ways to write a word.')
     parser.add_argument('-r', action='store_true',\
             dest='force_romaji', help='Always interpret search terms as English (Romaji) letters.')
     parser.add_argument('search_terms', help='Search terms for Jisho.')
@@ -136,7 +112,7 @@ def parser(args):
 def main(args_=None):
     args = parser(args_)
     result = jisho_search(args.search_terms, args.max_results, args.force_romaji)
-    print(result_as_str(result, args.display_other))
+    print(result_as_str(result))
 
 
 if __name__ == '__main__':

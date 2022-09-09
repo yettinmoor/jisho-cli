@@ -1,9 +1,5 @@
-install:
-	cp jint.py /usr/local/bin/jint
-	cp jisho.py /usr/local/bin/
-	echo 'python /usr/local/bin/jisho.py "$$@"' > /usr/local/bin/jisho
-	chmod 755 /usr/local/bin/jisho
-	chmod 755 /usr/local/bin/jint
+INSTALL_DIR:=${HOME}/.local/bin
 
-uninstall:
-	rm /usr/local/bin/{jint,jisho*}
+install:
+	sed '1i#!/usr/bin/env python3' jisho.py > ${INSTALL_DIR}/jisho
+	chmod +x ${INSTALL_DIR}/jisho
